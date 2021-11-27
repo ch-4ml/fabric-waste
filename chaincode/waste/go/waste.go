@@ -1,6 +1,6 @@
 // SmartContract(CC) of Safe Purging for Hamful Waste & Recycling from Factory 
 
-package wastetransfer
+package main
 
 import (
 	"encoding/json"
