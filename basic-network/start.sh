@@ -15,8 +15,8 @@ CA1_PRIVATE_KEY=$(ls crypto-config/peerOrganizations/org1.example.com/ca/ | grep
 CA2_PRIVATE_KEY=$(ls crypto-config/peerOrganizations/org2.example.com/ca/ | grep _sk)
 CA3_PRIVATE_KEY=$(ls crypto-config/peerOrganizations/org3.example.com/ca/ | grep _sk)
 sed -i "s/CA1_PRIVATE_KEY/$CA1_PRIVATE_KEY/g" docker-compose.yml
-sed -i "s/CA3_PRIVATE_KEY/$CA3_PRIVATE_KEY/g" docker-compose.yml
 sed -i "s/CA2_PRIVATE_KEY/$CA2_PRIVATE_KEY/g" docker-compose.yml
+sed -i "s/CA3_PRIVATE_KEY/$CA3_PRIVATE_KEY/g" docker-compose.yml
 
 docker-compose -f docker-compose.yml down
 

@@ -1,5 +1,4 @@
 // SmartContract(CC) of Safe Purging for Hamful Waste & Recycling from Factory 
-
 package main
 
 import (
