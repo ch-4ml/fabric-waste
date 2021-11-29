@@ -15,10 +15,18 @@ type SmartContract struct {}
 
 type Waste struct {
 	ObjectType string `json:"docType"`
+	CasNo  string `json:"casNo"`         
 	Name   string `json:"name"`			 
 	Color  string `json:"color"`		 
-	CasNo  string `json:"casno"`         
 	Phase  string `json:"phase"`         
+	Quantity string `json:"quantity"`
+}
+
+type EmissionRecord struct {
+	ObjectType string `json:"docType"`
+	CasNo	string	`json:"casNo"`
+	Cost string `json:"cost"`
+	Quantity string `json:"quantity"`
 }
 
 func (t *SmartContract) Init(APIstub shim.ChaincodeStubInterface) sc.Response {
@@ -32,14 +40,15 @@ func (t *SmartContract) Invoke(APIstub shim.ChaincodeStubInterface) sc.Response 
 	// 핸들러 이용한 
 	if function == "initLedger" {
 		return initLedger(APIstub)
-	} else if function == "createWaste" {
+	} else if function == "registerWaste" { // 물질 등록
+		return registerWaste(APIstub, args)
+	} else if function == "createWaste" { // 물질 생성
 		return createWaste(APIstub, args)
-	} else if function == "queryAllWastes" {
+	} else if function == "queryAllWastes" { // 조회
 		return queryAllWastes(APIstub)
-	} 
-	// else if function == "purgeWaste" {
-	// 	return purgeWaste(APIstub, args)
-	// }
+	} else if function == "purgeWaste" { // 배출
+		return purgeWaste(APIstub, args)
+	}
 	return shim.Error("Invalid Smart Contract function name.")
 }
 
@@ -47,10 +56,10 @@ func initLedger(APIstub shim.ChaincodeStubInterface) sc.Response {
 	ObjectType := "waste"
 	
 	wastes := []Waste{
-		Waste{Phase: "Gas", Name: "Cyanogen chloride", Color: "None", CasNo: "506-77-4"},
-		Waste{Phase: "Liquid", Name: "m-Crezol(Phenol)", Color: "yellow", CasNo: "108-39-4"},		
-		Waste{Phase: "Oil", Name: "Cyanogen chloride", Color: "None", CasNo: "506-77-4"},
-		Waste{Phase: "Solid", Name: "Carbon Steel(Metal)", Color: "None", CasNo: "scrap001"},				
+		Waste{Phase: "Gas", Name: "Cyanogen chloride", Color: "None", CasNo: "506-77-4", Quantity: "5000"},
+		Waste{Phase: "Liquid", Name: "m-Crezol(Phenol)", Color: "yellow", CasNo: "108-39-4", Quantity: "5000"},		
+		Waste{Phase: "Oil", Name: "Cyanogen chloride", Color: "None", CasNo: "506-77-4", Quantity: "5000"},
+		Waste{Phase: "Solid", Name: "Carbon Steel(Metal)", Color: "None", CasNo: "scrap001", Quantity: "5000"},				
 	}
 
 	i := 0
@@ -65,17 +74,50 @@ func initLedger(APIstub shim.ChaincodeStubInterface) sc.Response {
 	return shim.Success(nil)
 }
 
-func createWaste(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
+// 공장에서 처리할 폐기물을 등록하는 함수
+func registerWaste(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
 
 	if len(args) != 5 {
 		return shim.Error("Incorrect number of argument Expecting 5")
 	}
 
 	ObjectType := "waste"
-	waste := Waste{ObjectType: ObjectType, Phase: args[1], Name: args[2], Color: args[3], CasNo: args[4]}
+	waste := Waste{ObjectType: ObjectType, Phase: args[1], Name: args[2], Color: args[3], CasNo: args[4], Quantity: "0"}
 
 	wasteAsBytes, _ := json.Marshal(waste)
-	APIstub.PutState(ObjectType + args[0], wasteAsBytes)
+	APIstub.PutState(ObjectType + waste.CasNo + "-" + waste.Phase, wasteAsBytes)
+
+	return shim.Success(nil)
+}
+
+// 공장을 가동하면서 쌓이는 폐기물을 기록하는 함수
+func createWaste(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
+
+	// 0: CasNo, 1: Phase, 2: Quantity to add
+	if len(args) != 3 { 
+		return shim.Error("Incorrect number of argument Expecting 2")
+	}
+
+	ObjectType := "waste"
+
+	casNo := args[0]
+	phase := args[1]
+
+	wasteAsBytes, _ := APIstub.GetState(ObjectType + casNo + "-" + phase)
+
+	waste := Waste{}
+	json.Unmarshal(wasteAsBytes, &waste)
+	
+	q1, _ := strconv.Atoi(waste.Quantity)
+	q2, _ := strconv.Atoi(args[2])
+
+	quantity := q1 + q2
+	quantityToString := strconv.Itoa(quantity)
+
+	waste.Quantity = quantityToString
+	wasteAsBytes, _ = json.Marshal(waste)
+	
+	APIstub.PutState(ObjectType + casNo + "-" + phase, wasteAsBytes)
 
 	return shim.Success(nil)
 }
@@ -122,10 +164,14 @@ func queryAllWastes(APIstub shim.ChaincodeStubInterface) sc.Response {
 	return shim.Success(buffer.Bytes())
 }
 
-// func purgeWaste(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
+// 폐기물 처리
+func purgeWaste(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
 
-// 	return shim.Success(nil)
-// }
+
+	return shim.Success(nil)
+}
+
+// 폐기물 처리 내역 조회
 
 
 // The main function is only relevant in unit test mode. Only included here for completenes

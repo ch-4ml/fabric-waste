@@ -16,7 +16,7 @@ CC_SRC_PATH=github.com/fabcar/go
 
 # clean the keystore
 rm -rf ./hfc-key-store
-rm -rf ./wallet
+rm -rf ./wallet3
 
 # launch network; create channel and join peer to channel
 pushd ../basic-network
