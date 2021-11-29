@@ -6,7 +6,7 @@ set -ev
 docker exec cli peer chaincode install -n recycle -v 1.0 -p github.com/recycle/go
 
 # Instantiate chaincode
-docker exec cli peer chaincode instantiate -n recycle -v 1.0 -C mychannel2 -c '{"Args":[]}' -P 'OR ("Org1MSP.member", "Org2MSP.member")'
+docker exec cli peer chaincode instantiate -n recycle -v 1.0 -C mychannel2 -c '{"Args":[]}' -P 'OR ("Org1MSP.member", "Org3MSP.member")'
 sleep 5
 
 docker exec cli peer chaincode invoke -n recycle -C mychannel2 -c '{"Args":["initLedger"]}'
