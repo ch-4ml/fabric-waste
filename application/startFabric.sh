@@ -10,13 +10,9 @@ set -e
 # don't rewrite paths for Windows Git Bash users
 export MSYS_NO_PATHCONV=1
 
-CC_RUNTIME_LANGUAGE=golang
-CC_SRC_PATH=github.com/fabcar/go
-
-
 # clean the keystore
 rm -rf ./hfc-key-store
-rm -rf ./wallet3
+rm -rf ./wallet
 
 # launch network; create channel and join peer to channel
 pushd ../basic-network

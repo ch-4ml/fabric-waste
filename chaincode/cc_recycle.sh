@@ -27,7 +27,7 @@ docker exec cli peer chaincode query -n recycle -C mychannel2 -c '{"Args":["quer
 
 # 재활용 물질 처리 함수 호출 (purgeRecycle)
 # 0: CasNo, 1: Phase, 2: Quantity to purge, 3: Cost to purge
-docker exec cli peer chaincode invoke -n recycle -C mychannel2 -c '{"Args":["purgeRecycle", "scrap001", "Solid", "300", "1700"]}'
+docker exec cli peer chaincode invoke -n recycle -C mychannel2 -c '{"Args":["purgeRecycle", "scrap001", "Solid", "300", "1200"]}'
 sleep 5
 
 # 공장이 보유한 모든 재활용 물질을 조회하는 함수를 한 번 더 호출해서 재활용 물질 보유 량이 변경되었는지 확인
